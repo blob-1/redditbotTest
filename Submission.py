@@ -13,38 +13,17 @@ class Submission():
 		return(text)
 
 	def length(self):return len(self.__text)
-	
+		
 ##################################################
 
 class SubmissionList():
-	def __init__(self, start, end, sub, api):
-		self.__start = start
-		self.__end = end
-		self.__sub = sub
-		self.__api = api
-
-		self.fetchSubmissions()
+	def __init__(self, sub, start, end, api):
+		self.fetchSubmissions(sub, start, end, api)
 				
 	def fetchSubmissions(self, sub = None, start = None, end = None, api = None):
-		if sub == None:
-			sub = self.__sub
-		else :
-			self.__sub = sub
-			
-		if start == None:
-			start = self.__start
-		else:
-			self.__start = start
-		
-		if end  == None:
-			end = self.__end
-		else:
-			self.__end = end
-			
-		if api == None:
-			api = self.__api
-		else:
-			self.__api = api
+		self.__start = start.isoformat()
+		self.__end = end.isoformat()
+		self.__sub = sub
 		
 		DATA = list(api.search_submissions(
 								after=int(start.timestamp()),
@@ -73,6 +52,8 @@ class SubmissionList():
 			except AttributeError:
 				continue
 				
-	def getSubmissions(self):return self.__Submissions
+	def getSubmissions(self): return self.__Submissions
+		
+	def getFirstSubmission(self): return self.__Submissions[0]
 	
 	def __iter__(self): return iter(self.__Submissions)
