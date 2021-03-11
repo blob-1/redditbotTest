@@ -1,8 +1,9 @@
-class Submission():
-	def __init__(self):
-		self.__text = []
-	
-	def addline(self, line):self.__text.append(line)
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+class Submission(object):
+	def __init__(self, text = None):
+		self.__text = text
 	
 	def gettext(self):return self.__text
 	
@@ -13,12 +14,23 @@ class Submission():
 		return(text)
 
 	def length(self):return len(self.__text)
+	
+	def set_text(self, text): self.__text = text
+	
+	@classmethod
+	def from_json(cls, data): return Submission(data["_Submission__text"])
 		
 ##################################################
 
-class SubmissionList():
-	def __init__(self, sub, start, end, api):
-		self.fetchSubmissions(sub, start, end, api)
+class SubmissionList(object):
+	def __init__(self, sub, start, end, api = None, Submissions = None):
+		if api != None:
+			self.fetchSubmissions(sub, start, end, api)
+		else:
+			self.__start = start
+			self.__end = end
+			self.__sub = sub
+			self.__Submissions = Submissions
 				
 	def fetchSubmissions(self, sub = None, start = None, end = None, api = None):
 		self.__start = start.isoformat()
@@ -35,25 +47,33 @@ class SubmissionList():
 		self.__Submissions = []
 		for data in DATA:
 			line = ""
-			sub = Submission()
 			try:
-				for character in data.selftext:
-					if character == "\n":
-						sub.addline(line)
-						line = ""
-					else:
-						line = line + character	
-
-				if sub.length() > 1: 
+				if not ("[removed]" == data.selftext or "[deleted]" == data.selftext):
+					sub = Submission(data.selftext)
 					self.__Submissions.append(sub)
 				else:
 					continue
-			
 			except AttributeError:
 				continue
-				
+		
+	def getStart(self): return self.__start
+	def getEnd(self): return self.__end
+		
 	def getSubmissions(self): return self.__Submissions
 		
 	def getFirstSubmission(self): return self.__Submissions[0]
 	
 	def __iter__(self): return iter(self.__Submissions)
+	
+	@classmethod
+	def from_json(cls, data):
+		__Submissions = list()
+		for d in data["_SubmissionList__Submissions"]:
+			__Submissions.append(Submission.from_json(d))
+
+		return SubmissionList(
+							data["_SubmissionList__sub"],
+							data["_SubmissionList__start"],
+							data["_SubmissionList__end"],
+							Submissions = __Submissions
+							)
