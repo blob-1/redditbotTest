@@ -4,7 +4,7 @@ import json
 from RedditGetter import RedditGetter
 
 start = dt.datetime(2017, 1, 1)
-end   = dt.datetime(2017, 1, 10)
+end   = dt.datetime(2017, 1, 3)
 
 Getter = RedditGetter('TIFU', start, end)
 
