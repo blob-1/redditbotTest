@@ -3,13 +3,19 @@ import json
 
 from RedditGetter import RedditGetter
 
-start = dt.datetime(2017, 1, 1)
-end   = dt.datetime(2017, 1, 3)
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--get", type=Bool, default = True, help="fetch data")
+args = parser.parse_args()
 
-Getter = RedditGetter('TIFU', start, end)
+if args.get:
+	start = dt.datetime(2017, 1, 1)
+	end   = dt.datetime(2017, 1, 3)
 
-Getter.save("test.json")
+	Getter = RedditGetter('TIFU', start, end)
 
-Getter = RedditGetter.loadData("test.json")
+	Getter.save("test.json")
+else:
+	Getter = RedditGetter.loadData("test.json")
 	
 Getter.Show()
