@@ -5,7 +5,7 @@ from RedditGetter import RedditGetter
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("--get", type=Bool, default = True, help="fetch data")
+parser.add_argument("--get", type=bool, default = True, help="fetch data")
 args = parser.parse_args()
 
 if args.get:
