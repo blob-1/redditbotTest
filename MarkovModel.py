@@ -1,4 +1,4 @@
-from nltk import word_tokenize
+# from nltk import word_tokenize
 from random import choice, randint
 import codecs, json
 
@@ -16,7 +16,7 @@ class MarkovModel(object):
 		for subList in Data:
 			for sub in subList:
 			
-				wordTokens = word_tokenize(sub.gettext())
+				wordTokens = cutAtSpaces(sub.gettext())
 				
 				if len(wordTokens) > 5:
 					start = ""
@@ -95,7 +95,7 @@ class MarkovModel(object):
 			newgram = key
 			
 		NEWGnRAM = ""
-		for gram in word_tokenize(PREVnGRAM)[1:]:
+		for gram in cutAtSpaces(PREVnGRAM)[1:]:
 			NEWGnRAM += gram + " "
 		NEWGnRAM += newgram + " "
 			
@@ -123,3 +123,17 @@ def sortNgram(nGram):
 	for item in nGram[1]:
 		value += nGram[1][item]
 	return value
+	
+def cutAtSpaces(string):
+	tab = []
+	word = ""
+	for chars in string:
+		if chars == " ":
+			tab.append(word)
+			word = ""
+		else:
+			word+=chars
+	else:
+		if word != "":
+			tab.append(word)
+	return tab
