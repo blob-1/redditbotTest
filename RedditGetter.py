@@ -2,7 +2,6 @@ from psaw import PushshiftAPI # for the doc : https://pypi.org/project/psaw/
 import time
 import datetime as dt
 import codecs, json
-from nltk.tokenize import word_tokenize
 
 import Submission as SB
 
@@ -82,7 +81,7 @@ class RedditGetter(object):
 		for data in DATA:
 			try:
 				if not ("[removed]" == data.selftext or "[deleted]" == data.selftext):
-					subList.addSubmission(word_tokenize(data.selftext))
+					subList.addSubmission(data.selftext)
 				else:
 					continue
 			except AttributeError:

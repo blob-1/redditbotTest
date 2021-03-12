@@ -7,7 +7,7 @@ class Submission(object):
 	def __str__(self):
 		text = ''
 		for word in self.__text:
-			text = text+" "+word 
+			text = text+word 
 		return(text)
 
 	def length(self):return len(self.__text)
