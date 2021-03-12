@@ -3,11 +3,11 @@ from random import choice, randint
 import codecs, json
 
 class MarkovModel(object):
-	def __init__(self):
-		self.__StartGrams = {}
-		self.__nbStartGrams = 0
-		self.__nGRAMS = {}
-		self.__n = 0
+	def __init__(self, StartGrams = {}, nbStartGrams = 0, nGRAMS = {}, n = 0):
+		self.__StartGrams = StartGrams
+		self.__nbStartGrams = nbStartGrams
+		self.__nGRAMS = nGRAMS
+		self.__n = n
 		
 	def generateModel(self, Data, n = 3):
 		self.__nGRAMS = {}
@@ -103,6 +103,20 @@ class MarkovModel(object):
 		
 	def save(self, file):		
 		json.dump(self, codecs.open(file, 'w', encoding='utf-8'), separators=(',', ':'), sort_keys=True, indent=4, default = lambda o: o.__dict__)	
+	
+	@classmethod	
+	def loadData(cls, file):
+		with open(file, 'r') as j:
+			return MarkovModel.from_json(json.loads(j.read()))
+		
+	@classmethod
+	def from_json(cls, data):
+		return MarkovModel(
+						data["_MarkovModel__StartGrams"],
+						data["_MarkovModel__nbStartGrams"],
+						data["_MarkovModel__nGRAMS"],
+						data["_MarkovModel__n"]
+						)
 		
 def sortNgram(nGram):
 	value = 0
