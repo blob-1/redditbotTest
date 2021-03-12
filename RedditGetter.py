@@ -2,6 +2,7 @@ from psaw import PushshiftAPI # for the doc : https://pypi.org/project/psaw/
 import time
 import datetime as dt
 import codecs, json
+from nltk.tokenize import word_tokenize
 
 import Submission as SB
 
@@ -28,9 +29,8 @@ class RedditGetter(object):
 	
 	
 		while dateStart < dateEnd:
-			Subs = SB.SubmissionList(sub, dateStart, dateStart+timedelta, api)
+			self.__Data.append(self.fetchSubmissions(sub, dateStart, dateStart+timedelta, api))
 			dateStart = dateStart + timedelta
-			self.__Data.append(Subs)
 			time.sleep(20)
 
 	def getSub(self):return self.__sub
@@ -66,9 +66,28 @@ class RedditGetter(object):
 		for data in self.__Data:
 			subList = data.getSubmissions()
 			for sub in subList:
-				print(sub.gettext())
+				print(sub)
 			print(data.getStart())
 			print(data.getEnd())
+			
+	def fetchSubmissions(self, sub = None, start = None, end = None, api = None):
+		DATA = list(api.search_submissions(
+								after=int(start.timestamp()),
+								before=int(end.timestamp()),
+								subreddit=sub,
+								filter=['selftext'],
+								limit=None))
+
+		subList = SB.SubmissionList(sub, start.isoformat(), end.isoformat())
+		for data in DATA:
+			try:
+				if not ("[removed]" == data.selftext or "[deleted]" == data.selftext):
+					subList.addSubmission(word_tokenize(data.selftext))
+				else:
+					continue
+			except AttributeError:
+				continue
+		return subList
 
 	@classmethod
 	def from_json(cls, data):		

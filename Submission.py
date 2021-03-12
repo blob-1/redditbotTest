@@ -1,6 +1,3 @@
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-
 class Submission(object):
 	def __init__(self, text = None):
 		self.__text = text
@@ -9,8 +6,8 @@ class Submission(object):
 	
 	def __str__(self):
 		text = ''
-		for line in self.__text:
-			text = text+line+"\n"
+		for word in self.__text:
+			text = text+" "+word 
 		return(text)
 
 	def length(self):return len(self.__text)
@@ -23,41 +20,16 @@ class Submission(object):
 ##################################################
 
 class SubmissionList(object):
-	def __init__(self, sub, start, end, api = None, Submissions = None):
-		if api != None:
-			self.fetchSubmissions(sub, start, end, api)
-		else:
+	def __init__(self, sub, start, end, Submissions =[]):
 			self.__start = start
 			self.__end = end
 			self.__sub = sub
 			self.__Submissions = Submissions
-				
-	def fetchSubmissions(self, sub = None, start = None, end = None, api = None):
-		self.__start = start.isoformat()
-		self.__end = end.isoformat()
-		self.__sub = sub
-		
-		DATA = list(api.search_submissions(
-								after=int(start.timestamp()),
-								before=int(end.timestamp()),
-								subreddit=sub,
-								filter=['selftext'],
-								limit=None))
-
-		self.__Submissions = []
-		for data in DATA:
-			line = ""
-			try:
-				if not ("[removed]" == data.selftext or "[deleted]" == data.selftext):
-					sub = Submission(data.selftext)
-					self.__Submissions.append(sub)
-				else:
-					continue
-			except AttributeError:
-				continue
 		
 	def getStart(self): return self.__start
 	def getEnd(self): return self.__end
+	
+	def addSubmission(self, sub): self.__Submissions.append(Submission(sub))
 		
 	def getSubmissions(self): return self.__Submissions
 		
@@ -67,7 +39,7 @@ class SubmissionList(object):
 	
 	@classmethod
 	def from_json(cls, data):
-		__Submissions = list()
+		__Submissions = []
 		for d in data["_SubmissionList__Submissions"]:
 			__Submissions.append(Submission.from_json(d))
 
