@@ -1,6 +1,7 @@
 import datetime as dt
 
 from RedditGetter import RedditGetter
+from MarkovModel import MarkovModel
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -9,8 +10,8 @@ parser.add_argument("--sub", type=str, help="define the sub", required = True)
 args = parser.parse_args()
 
 if args.get:
-	start = dt.datetime(2017, 1, 1)
-	end   = dt.datetime(2017, 1, 3)
+	start = dt.datetime(2020, 2, 1)
+	end   = dt.datetime(2020, 2, 4)
 
 	Getter = RedditGetter(args.sub, start, end)
 
@@ -18,7 +19,9 @@ if args.get:
 else:
 	Getter = RedditGetter.loadData(args.sub+".json")
 	
-Getter.Show()
+# Getter.Show()
 
+# MM = MarkovModel()
+# MM.generateModel(Getter.getData())
 
 

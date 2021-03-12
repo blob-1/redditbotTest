@@ -5,7 +5,6 @@ import codecs, json
 
 import Submission as SB
 
-
 class RedditGetter(object):
 	def __init__(self, sub, dateStart, dateEnd, data = None):
 		if data == None:
@@ -26,11 +25,10 @@ class RedditGetter(object):
 		self.__dateStart = dateStart.isoformat()
 		self.__dateEnd = dateEnd.isoformat()	
 	
-	
-		while dateStart < dateEnd:
+		while dateStart < dateEnd:	
 			self.__Data.append(self.fetchSubmissions(sub, dateStart, dateStart+timedelta, api))
 			dateStart = dateStart + timedelta
-			time.sleep(20)
+			time.sleep(10)
 
 	def getSub(self):return self.__sub
 	def getStart(self):return self.__dateStart
@@ -57,7 +55,7 @@ class RedditGetter(object):
 				# jsonData[str(date)].append(sub.gettext())
 
 			# date = date + timedelta
-			
+
 		json.dump(self, codecs.open(file, 'w', encoding='utf-8'), separators=(',', ':'), sort_keys=True, indent=4, default = lambda o: o.__dict__)
 
 	# for testing ONLY !
@@ -77,7 +75,8 @@ class RedditGetter(object):
 								filter=['selftext'],
 								limit=None))
 
-		subList = SB.SubmissionList(sub, start.isoformat(), end.isoformat())
+		subList = SB.SubmissionList(sub, start.isoformat(), end.isoformat(), Submissions = [])
+
 		for data in DATA:
 			try:
 				if not ("[removed]" == data.selftext or "[deleted]" == data.selftext):
@@ -90,13 +89,15 @@ class RedditGetter(object):
 
 	@classmethod
 	def from_json(cls, data):		
-		__Data = list(map(SB.SubmissionList.from_json, data["_RedditGetter__Data"]))
+		__Submissions = []
+		for d in data["_RedditGetter__Data"]:
+			__Submissions.append(SB.SubmissionList.from_json(d))
 		
 		return RedditGetter(
 						data["_RedditGetter__sub"],
 						data["_RedditGetter__dateStart"],
 						data["_RedditGetter__dateEnd"],
-						__Data
+						__Submissions
 						)
 	
 	@classmethod	

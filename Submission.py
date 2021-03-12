@@ -15,12 +15,12 @@ class Submission(object):
 	def set_text(self, text): self.__text = text
 	
 	@classmethod
-	def from_json(cls, data): return Submission(data["_Submission__text"])
+	def from_json(cls, data):return Submission(data["_Submission__text"])
 		
 ##################################################
 
 class SubmissionList(object):
-	def __init__(self, sub, start, end, Submissions =[]):
+	def __init__(self, sub, start, end, Submissions = []):
 			self.__start = start
 			self.__end = end
 			self.__sub = sub
