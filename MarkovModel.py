@@ -1,13 +1,17 @@
 from nltk import word_tokenize
+from random import choice, randint
+import codecs, json
 
 class MarkovModel(object):
 	def __init__(self):
-		self.__StartGrams = []
+		self.__StartGrams = {}
+		self.__nbStartGrams = 0
 		self.__nGRAMS = {}
+		self.__n = 0
 		
 	def generateModel(self, Data, n = 3):
 		self.__nGRAMS = {}
-		ngram = ""
+		self.__n = n
 		
 		for subList in Data:
 			for sub in subList:
@@ -16,17 +20,25 @@ class MarkovModel(object):
 				
 				if len(wordTokens) > 5:
 					start = ""
-					for word in wordTokens[:3]:
+					for word in wordTokens[:n]:
 						start += word + " "
-					self.__StartGrams.append(start)
+
+					if start not in self.__StartGrams.keys():
+						self.__StartGrams[start] = 1
+					else:
+						self.__StartGrams[start] += 1
+					self.__nbStartGrams += 1
+						
 				else:
 					continue
 				
 				for i, word in enumerate(wordTokens):
 					txt = wordTokens[i:i+n]
-					for gram in txt:ngram+=gram+" "
+					ngram = ""
+					for gram in txt:
+						ngram += gram + " "
 					try:
-						nextGram = wordTokens[i+n+1]
+						nextGram = wordTokens[i+n]
 					except IndexError:
 						break
 						
@@ -37,9 +49,60 @@ class MarkovModel(object):
 							self.__nGRAMS[ngram][nextGram] = 1
 						else:
 							self.__nGRAMS[ngram][nextGram] += 1
-					ngram = ""
 						
-		print(sorted(self.__nGRAMS.items(), key=lambda item: sortNgram(item)))
+		# print(sorted(self.__nGRAMS.items(), key=lambda item: sortNgram(item)))
+		# print(self.__StartGrams)
+		
+	def generateText(self):
+		# find first nGRAM
+		target = randint(0, self.__nbStartGrams-1)
+		i = 0
+		STARTnGRAM = ""
+		for key in self.__StartGrams.keys():
+			if i == target:
+				STARTnGRAM = key
+				break
+			i += 1
+		else:
+			STARTnGRAM = key
+		
+		# find subsequent GRAMS
+		NEWnGRAM = STARTnGRAM
+		TEXT = STARTnGRAM
+		newgram = ""
+		while True:
+			try:
+				newgram, NEWnGRAM = self.__findnextGram(NEWnGRAM)
+			except KeyError: # if we reach a key error then we are at the end of a text ^^
+				break
+			TEXT += newgram + " "
+		print(TEXT)
+		
+	def __findnextGram(self, PREVnGRAM):		
+		cpt = 0
+		for key in self.__nGRAMS[PREVnGRAM]:
+			cpt += self.__nGRAMS[PREVnGRAM][key] # get nb of possibility
+		
+		target = randint(0, cpt)	
+		i = 0
+		newgram = ""
+		for key in self.__nGRAMS[PREVnGRAM].keys():
+			if i >= target:
+				newgram = key
+				break
+			i += self.__nGRAMS[PREVnGRAM][key]
+		else:
+			newgram = key
+			
+		NEWGnRAM = ""
+		for gram in word_tokenize(PREVnGRAM)[1:]:
+			NEWGnRAM += gram + " "
+		NEWGnRAM += newgram + " "
+			
+		return newgram, NEWGnRAM
+		
+	def save(self, file):		
+		json.dump(self, codecs.open(file, 'w', encoding='utf-8'), separators=(',', ':'), sort_keys=True, indent=4, default = lambda o: o.__dict__)	
 		
 def sortNgram(nGram):
 	value = 0

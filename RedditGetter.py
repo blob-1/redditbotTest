@@ -79,7 +79,7 @@ class RedditGetter(object):
 
 		for data in DATA:
 			try:
-				if not ("[removed]" == data.selftext or "[deleted]" == data.selftext):
+				if not ("[removed]" == data.selftext or "[deleted]" == data.selftext or "" == data.selftext):
 					subList.addSubmission(data.selftext)
 				else:
 					continue
@@ -89,15 +89,13 @@ class RedditGetter(object):
 
 	@classmethod
 	def from_json(cls, data):		
-		__Submissions = []
-		for d in data["_RedditGetter__Data"]:
-			__Submissions.append(SB.SubmissionList.from_json(d))
-		
+		__Data = list(map(SB.SubmissionList.from_json, data["_RedditGetter__Data"]))
+
 		return RedditGetter(
 						data["_RedditGetter__sub"],
 						data["_RedditGetter__dateStart"],
 						data["_RedditGetter__dateEnd"],
-						__Submissions
+						__Data
 						)
 	
 	@classmethod	

@@ -11,7 +11,7 @@ args = parser.parse_args()
 
 if args.get:
 	start = dt.datetime(2020, 2, 1)
-	end   = dt.datetime(2020, 2, 4)
+	end   = dt.datetime(2020, 2, 2)
 
 	Getter = RedditGetter(args.sub, start, end)
 
@@ -21,7 +21,9 @@ else:
 	
 # Getter.Show()
 
-# MM = MarkovModel()
-# MM.generateModel(Getter.getData())
+MM = MarkovModel()
+MM.generateModel(Getter.getData())
+MM.generateText()
 
+MM.save(args.sub+"MM.json")
 
